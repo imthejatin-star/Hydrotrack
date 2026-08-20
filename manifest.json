@@ -1,0 +1,11 @@
+{
+  "name": "HydroTrack",
+  "short_name": "HydroTrack",
+  "description": "Personal hydration monitor and water reminder",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#061019",
+  "background_color": "#061019",
+  "icons": []
+}
