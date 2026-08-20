@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#061019">
+<title>HydroTrack</title>
+
+<style>
+:root{
+    --bg:#061019;
+    --card:rgba(15,31,44,.82);
+    --line:rgba(130,200,235,.14);
+    --text:#f5fbff;
+    --muted:#8fa8b8;
+    --blue:#35baf5;
+    --blue2:#137db5;
+    --green:#4bd99b;
+    --red:#ff6878;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    color:var(--text);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:
+        radial-gradient(circle at 15% 0%,rgba(38,170,230,.2),transparent 30%),
+        radial-gradient(circle at 100% 45%,rgba(42,210,170,.08),transparent 30%),
+        linear-gradient(145deg,#050e15,#091b29 55%,#061019);
+    padding:22px 15px 40px;
+}
+
+button{
+    font:inherit;
+}
+
+button:active{
+    transform:scale(.97);
+}
+
+.app{
+    width:min(100%,470px);
+    margin:auto;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:11px;
+}
+
+.brandIcon{
+    width:47px;
+    height:47px;
+    display:grid;
+    place-items:center;
+    border-radius:15px;
+    font-size:24px;
+    background:linear-gradient(145deg,#1c9bd4,#104f73);
+    box-shadow:0 8px 25px rgba(25,155,215,.18);
+}
+
+.brand h1{
+    font-size:23px;
+    letter-spacing:-.7px;
+}
+
+.brand p{
+    color:var(--muted);
+    font-size:11px;
+}
+
+.date{
+    text-align:right;
+    color:var(--muted);
+    font-size:11px;
+    line-height:1.4;
+}
+
+.card{
+    background:linear-gradient(145deg,var(--card),rgba(8,23,34,.9));
+    border:1px solid var(--line);
+    border-radius:27px;
+    padding:21px;
+    margin-bottom:15px;
+    box-shadow:0 22px 65px rgba(0,0,0,.32);
+    backdrop-filter:blur(20px);
+}
+
+.hero{
+    text-align:center;
+    padding-top:26px;
+}
+
+.ring{
+    width:202px;
+    height:202px;
+    margin:0 auto 23px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    position:relative;
+    background:conic-gradient(
+        var(--blue) var(--progress,0%),
+        rgba(255,255,255,.055) var(--progress,0%)
+    );
+    box-shadow:0 0 45px rgba(45,184,244,.13);
+    transition:.35s ease;
+}
+
+.ring:before{
+    content:"";
+    position:absolute;
+    inset:9px;
+    border-radius:50%;
+    background:#0b202f;
+}
+
+.ringContent{
+    position:relative;
+    z-index:2;
+}
+
+.amount{
+    font-size:38px;
+    font-weight:850;
+    letter-spacing:-1.5px;
+}
+
+.sub{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:3px;
+}
+
+.percent{
+    color:var(--blue);
+    font-weight:750;
+    font-size:13px;
+    margin-top:8px;
+}
+
+.goalRow{
+    display:flex;
+    justify-content:space-between;
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:8px;
+}
+
+.goalRow strong{
+    color:#e4f4fb;
+}
+
+.progress{
+    height:8px;
+    border-radius:99px;
+    overflow:hidden;
+    background:rgba(255,255,255,.06);
+}
+
+.progressFill{
+    height:100%;
+    width:0%;
+    border-radius:99px;
+    background:linear-gradient(90deg,#198cc7,#4bd5ff);
+    transition:width .35s ease;
+}
+
+.quick{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:17px;
+}
+
+.quick button{
+    border:1px solid rgba(100,190,230,.13);
+    background:rgba(255,255,255,.035);
+    color:#eaf8ff;
+    padding:12px 4px;
+    border-radius:13px;
+    cursor:pointer;
+}
+
+.drink{
+    width:100%;
+    margin-top:11px;
+    border:0;
+    border-radius:16px;
+    padding:16px;
+    background:linear-gradient(135deg,#229fd9,#146d9e);
+    color:white;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:0 10px 28px rgba(24,148,207,.17);
+}
+
+.title{
+    font-size:15px;
+    font-weight:800;
+    margin-bottom:15px;
+}
+
+.intervals{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+.interval{
+    border:1px solid rgba(120,195,230,.13);
+    background:rgba(255,255,255,.035);
+    color:#cbdde7;
+    padding:12px 3px;
+    border-radius:13px;
+    cursor:pointer;
+}
+
+.interval small{
+    display:block;
+    color:var(--muted);
+    font-size:9px;
+    margin-top:3px;
+}
+
+.interval.active{
+    background:rgba(39,169,228,.17);
+    border-color:rgba(56,190,247,.7);
+    color:white;
+}
+
+.setting{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    margin-top:19px;
+    padding-top:18px;
+    border-top:1px solid rgba(255,255,255,.055);
+}
+
+.setting h3{
+    font-size:14px;
+    margin-bottom:4px;
+}
+
+.setting p{
+    color:var(--muted);
+    font-size:11px;
+}
+
+.toggle{
+    width:55px;
+    height:31px;
+    padding:4px;
+    border-radius:99px;
+    background:#263b47;
+    flex-shrink:0;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.knob{
+    width:23px;
+    height:23px;
+    border-radius:50%;
+    background:white;
+    transition:.22s;
+}
+
+.toggle.on{
+    background:#159bd5;
+}
+
+.toggle.on .knob{
+    transform:translateX(24px);
+}
+
+.next{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:18px;
+    padding:15px;
+    border-radius:16px;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.055);
+}
+
+.nextLeft{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.bell{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    display:grid;
+    place-items:center;
+    background:rgba(50,180,240,.11);
+}
+
+.nextLabel{
+    color:var(--muted);
+    font-size:9px;
+}
+
+.nextTime{
+    font-weight:750;
+    font-size:13px;
+    margin-top:2px;
+}
+
+.countdown{
+    color:var(--blue);
+    font-size:18px;
+    font-weight:850;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+.stat{
+    text-align:center;
+    padding:15px 5px;
+    border-radius:16px;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.05);
+}
+
+.value{
+    font-size:18px;
+    font-weight:850;
+}
+
+.label{
+    color:var(--muted);
+    font-size:9px;
+    margin-top:4px;
+}
+
+.notificationBox{
+    display:none;
+    margin-top:15px;
+    padding:13px;
+    border-radius:15px;
+    background:rgba(255,196,74,.08);
+    border:1px solid rgba(255,196,74,.2);
+    color:#ffe5a3;
+    font-size:11px;
+    line-height:1.45;
+}
+
+.notificationBox.show{
+    display:block;
+}
+
+.tip{
+    text-align:center;
+    color:var(--muted);
+    font-size:10px;
+    line-height:1.5;
+    padding:4px 12px;
+}
+
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:25px;
+    transform:translate(-50%,25px);
+    opacity:0;
+    pointer-events:none;
+    background:#102d3d;
+    border:1px solid rgba(70,190,240,.25);
+    padding:12px 17px;
+    border-radius:14px;
+    font-size:12px;
+    z-index:150;
+    transition:.25s;
+    white-space:nowrap;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
+
+.reminderOverlay{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:none;
+    place-items:center;
+    padding:20px;
+    background:rgba(1,9,15,.72);
+    backdrop-filter:blur(8px);
+}
+
+.reminderOverlay.show{
+    display:grid;
+}
+
+.reminderBox{
+    width:min(100%,380px);
+    text-align:center;
+    padding:30px 22px;
+    border-radius:28px;
+    background:#0c2433;
+    border:1px solid rgba(70,190,240,.2);
+    box-shadow:0 30px 90px rgba(0,0,0,.5);
+    animation:pop .25s ease;
+}
+
+@keyframes pop{
+    from{
+        transform:scale(.92);
+        opacity:0;
+    }
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+.reminderEmoji{
+    font-size:50px;
+    margin-bottom:12px;
+}
+
+.reminderBox h2{
+    font-size:24px;
+    margin-bottom:7px;
+}
+
+.reminderBox p{
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.5;
+}
+
+.reminderButton{
+    width:100%;
+    margin-top:20px;
+    border:0;
+    padding:15px;
+    border-radius:15px;
+    background:#209bd5;
+    color:white;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.resetButton{
+    width:100%;
+    margin-top:10px;
+    border:1px solid rgba(255,104,120,.2);
+    padding:12px;
+    border-radius:14px;
+    background:rgba(255,104,120,.06);
+    color:#ff9aa5;
+    cursor:pointer;
+}
+
+@media(max-width:350px){
+    .ring{
+        width:180px;
+        height:180px;
+    }
+
+    .amount{
+        font-size:33px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header class="topbar">
+    <div class="brand">
+        <div class="brandIcon">💧</div>
+        <div>
+            <h1>HydroTrack</h1>
+            <p>Personal hydration monitor</p>
+        </div>
+    </div>
+
+    <div class="date" id="date"></div>
+</header>
+
+<section class="card hero">
+
+    <div class="ring" id="ring">
+        <div class="ringContent">
+            <div class="amount" id="amount">0 ml</div>
+            <div class="sub">consumed today</div>
+            <div class="percent" id="percent">0%</div>
+        </div>
+    </div>
+
+    <div class="goalRow">
+        <span>Daily goal</span>
+        <strong>2000 ml</strong>
+    </div>
+
+    <div class="progress">
+        <div class="progressFill" id="progress"></div>
+    </div>
+
+    <div class="quick">
+        <button onclick="addWater(150)">+150 ml</button>
+        <button onclick="addWater(250)">+250 ml</button>
+        <button onclick="addWater(500)">+500 ml</button>
+    </div>
+
+    <button class="drink" onclick="addWater(250)">
+        💧 I Drank 250 ml
+    </button>
+
+</section>
+
+<section class="card">
+
+    <div class="title">Reminder interval</div>
+
+    <div class="intervals">
+
+        <button class="interval" data-time="30" onclick="chooseInterval(30)">
+            30 min
+            <small>Frequent</small>
+        </button>
+
+        <button class="interval" data-time="60" onclick="chooseInterval(60)">
+            60 min
+            <small>Balanced</small>
+        </button>
+
+        <button class="interval" data-time="90" onclick="chooseInterval(90)">
+            90 min
+            <small>Relaxed</small>
+        </button>
+
+    </div>
+
+    <div class="setting">
+
+        <div>
+            <h3>Hydration reminders</h3>
+            <p id="status">Reminders are OFF</p>
+        </div>
+
+        <div class="toggle" id="toggle" onclick="toggleReminders()">
+            <div class="knob"></div>
+        </div>
+
+    </div>
+
+    <div class="notificationBox" id="notificationBox">
+        Notifications need permission. Allow notifications when Android asks.
+    </div>
+
+    <div class="next">
+
+        <div class="nextLeft">
+
+            <div class="bell">🔔</div>
+
+            <div>
+                <div class="nextLabel">NEXT REMINDER</div>
+                <div class="nextTime" id="nextTime">Reminders off</div>
+            </div>
+
+        </div>
+
+        <div class="countdown" id="countdown">—</div>
+
+    </div>
+
+</section>
+
+<section class="card">
+
+    <div class="title">Today's overview</div>
+
+    <div class="stats">
+
+        <div class="stat">
+            <div class="value" id="drinks">0</div>
+            <div class="label">DRINKS</div>
+        </div>
+
+        <div class="stat">
+            <div class="value" id="left">2000</div>
+            <div class="label">ML LEFT</div>
+        </div>
+
+        <div class="stat">
+            <div class="value" id="goal">0%</div>
+            <div class="label">GOAL</div>
+        </div>
+
+    </div>
+
+    <button class="resetButton" onclick="resetToday()">
+        Reset today's progress
+    </button>
+
+</section>
+
+<div class="tip">
+    💡 Hydration needs vary with activity, weather and other factors.
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="reminderOverlay" id="overlay">
+
+    <div class="reminderBox">
+
+        <div class="reminderEmoji">💧</div>
+
+        <h2>Water break</h2>
+
+        <p>
+            Your hydration reminder has arrived.
+            Take a moment to drink some water.
+        </p>
+
+        <button class="reminderButton" onclick="closeReminder()">
+            Done — I drank water
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+const GOAL = 2000;
+
+let amount = Number(localStorage.getItem("hydro_amount") || 0);
+let drinks = Number(localStorage.getItem("hydro_drinks") || 0);
+let interval = Number(localStorage.getItem("hydro_interval") || 60);
+let reminders = localStorage.getItem("hydro_reminders") === "true";
+let nextReminder = Number(localStorage.getItem("hydro_next") || 0);
+
+const today = new Date().toDateString();
+const savedDay = localStorage.getItem("hydro_day");
+
+if(savedDay !== today){
+    amount = 0;
+    drinks = 0;
+    nextReminder = 0;
+    reminders = false;
+
+    localStorage.setItem("hydro_day", today);
+}
+
+function save(){
+
+    localStorage.setItem("hydro_amount", amount);
+    localStorage.setItem("hydro_drinks", drinks);
+    localStorage.setItem("hydro_interval", interval);
+    localStorage.setItem("hydro_reminders", reminders);
+    localStorage.setItem("hydro_next", nextReminder);
+    localStorage.setItem("hydro_day", today);
+}
+
+function render(){
+
+    const percentage =
+        Math.min(Math.round((amount / GOAL) * 100),100);
+
+    const remaining =
+        Math.max(GOAL - amount,0);
+
+    document.getElementById("amount").textContent =
+        amount + " ml";
+
+    document.getElementById("percent").textContent =
+        percentage + "%";
+
+    document.getElementById("progress").style.width =
+        percentage + "%";
+
+    document.getElementById("ring")
+        .style.setProperty("--progress", percentage + "%");
+
+    document.getElementById("drinks").textContent = drinks;
+    document.getElementById("left").textContent = remaining;
+    document.getElementById("goal").textContent = percentage + "%";
+
+    document.querySelectorAll(".interval").forEach(button => {
+        button.classList.toggle(
+            "active",
+            Number(button.dataset.time) === interval
+        );
+    });
+
+    document.getElementById("toggle")
+        .classList.toggle("on", reminders);
+
+    document.getElementById("status").textContent =
+        reminders
+        ? "Reminders ON • Every " + interval + " minutes"
+        : "Reminders are OFF";
+
+    updateCountdown();
+}
+
+function addWater(ml){
+
+    amount += ml;
+    drinks++;
+
+    save();
+    render();
+
+    showToast("+" + ml + " ml added 💧");
+
+    if(amount >= GOAL){
+        showToast("Daily goal reached 🎉");
+    }
+}
+
+function chooseInterval(minutes){
+
+    interval = minutes;
+
+    if(reminders){
+        nextReminder =
+            Date.now() + interval * 60 * 1000;
+    }
+
+    save();
+    render();
+
+    showToast("Interval set to " + minutes + " minutes");
+}
+
+async function requestNotifications(){
+
+    if("Notification" in window){
+
+        try{
+
+            if(Notification.permission === "default"){
+                const permission =
+                    await Notification.requestPermission();
+
+                return permission === "granted";
+            }
+
+            return Notification.permission === "granted";
+
+        }catch(error){
+            return false;
+        }
+    }
+
+    return false;
+}
+
+async function scheduleNativeNotification(){
+
+    const plugin =
+        window.Capacitor?.Plugins?.LocalNotifications;
+
+    if(!plugin) return false;
+
+    try{
+
+        const permission =
+            await plugin.requestPermissions();
+
+        if(permission.display !== "granted"){
+            return false;
+        }
+
+        await plugin.cancel({
+            notifications:[
+                {id:1001}
+            ]
+        }).catch(()=>{});
+
+        await plugin.schedule({
+            notifications:[
+                {
+                    id:1001,
+                    title:"💧 HydroTrack",
+                    body:"Time for a water break. Drink some water.",
+                    schedule:{
+                        every:"minute",
+                        count:interval
+                    },
+                    extra:{
+                        type:"water-reminder"
+                    }
+                }
+            ]
+        });
+
+        return true;
+
+    }catch(error){
+        console.log(error);
+        return false;
+    }
+}
+
+async function cancelNativeNotification(){
+
+    const plugin =
+        window.Capacitor?.Plugins?.LocalNotifications;
+
+    if(!plugin) return;
+
+    try{
+
+        await plugin.cancel({
+            notifications:[
+                {id:1001}
+            ]
+        });
+
+    }catch(error){
+        console.log(error);
+    }
+}
+
+async function toggleReminders(){
+
+    if(!reminders){
+
+        const nativeAvailable =
+            !!window.Capacitor?.Plugins?.LocalNotifications;
+
+        let permissionGranted = false;
+
+        if(nativeAvailable){
+            permissionGranted =
+                await scheduleNativeNotification();
+        }else{
+            permissionGranted =
+                await requestNotifications();
+        }
+
+        if(!permissionGranted){
+
+            document
+                .getElementById("notificationBox")
+                .classList.add("show");
+
+            showToast("Allow notifications first");
+
+            return;
+        }
+
+        reminders = true;
+
+        nextReminder =
+            Date.now() + interval * 60 * 1000;
+
+        showToast("Reminders ON 🔔");
+
+    }else{
+
+        reminders = false;
+        nextReminder = 0;
+
+        await cancelNativeNotification();
+
+        showToast("Reminders OFF");
+    }
+
+    save();
+    render();
+    updateNotificationMessage();
+}
+
+function updateNotificationMessage(){
+
+    const box =
+        document.getElementById("notificationBox");
+
+    if(!reminders){
+        box.classList.remove("show");
+        return;
+    }
+
+    if(
+        "Notification" in window &&
+        Notification.permission === "granted"
+    ){
+        box.classList.remove("show");
+    }else{
+        box.classList.add("show");
+    }
+}
+
+function updateCountdown(){
+
+    const next =
+        document.getElementById("nextTime");
+
+    const countdown =
+        document.getElementById("countdown");
+
+    if(!reminders || !nextReminder){
+
+        next.textContent = "Reminders off";
+        countdown.textContent = "—";
+
+        return;
+    }
+
+    let difference =
+        nextReminder - Date.now();
+
+    if(difference <= 0){
+
+        triggerReminder();
+
+        nextReminder =
+            Date.now() + interval * 60 * 1000;
+
+        save();
+
+        difference =
+            nextReminder - Date.now();
+    }
+
+    const totalSeconds =
+        Math.floor(difference / 1000);
+
+    const minutes =
+        Math.floor(totalSeconds / 60);
+
+    const seconds =
+        totalSeconds % 60;
+
+    countdown.textContent =
+        String(minutes).padStart(2,"0") +
+        ":" +
+        String(seconds).padStart(2,"0");
+
+    const time = new Date(nextReminder);
+
+    next.textContent =
+        time.toLocaleTimeString([],{
+            hour:"numeric",
+            minute:"2-digit"
+        });
+}
+
+function triggerReminder(){
+
+    showReminder();
+
+    if(
+        "Notification" in window &&
+        Notification.permission === "granted"
+    ){
+
+        try{
+
+            new Notification(
+                "💧 HydroTrack",
+                {
+                    body:
+                    "Time for a water break. Drink some water."
+                }
+            );
+
+        }catch(error){}
+    }
+}
+
+function showReminder(){
+
+    document
+        .getElementById("overlay")
+        .classList.add("show");
+}
+
+function closeReminder(){
+
+    document
+        .getElementById("overlay")
+        .classList.remove("show");
+
+    addWater(250);
+}
+
+function showToast(message){
+
+    const toast =
+        document.getElementById("toast");
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    clearTimeout(window.toastTimer);
+
+    window.toastTimer =
+        setTimeout(() => {
+            toast.classList.remove("show");
+        },1800);
+}
+
+function resetToday(){
+
+    if(!confirm("Reset today's water progress?")) return;
+
+    amount = 0;
+    drinks = 0;
+
+    save();
+    render();
+
+    showToast("Today's progress reset");
+}
+
+function updateDate(){
+
+    const now = new Date();
+
+    document.getElementById("date").innerHTML =
+        now.toLocaleDateString([],{
+            weekday:"short"
+        }) +
+        "<br>" +
+        now.toLocaleDateString([],{
+            day:"numeric",
+            month:"short"
+        });
+}
+
+document.addEventListener("visibilitychange", () => {
+
+    if(document.visibilityState === "visible"){
+        render();
+        updateDate();
+    }
+
+});
+
+updateDate();
+render();
+updateNotificationMessage();
+
+setInterval(() => {
+
+    if(document.visibilityState === "visible"){
+        updateCountdown();
+    }
+
+},1000);
+
+setInterval(updateDate,30000);
+</script>
+
+</body>
+</html>
